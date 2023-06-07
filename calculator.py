@@ -63,7 +63,9 @@ def solveMultDiv(arr):
 
     curr = 1
     while curr < len(arr):
+
         if arr[curr] == '*' or arr[curr] == '/':
+
             if arr[curr] == '*':
                 arr[curr - 1] = str(float(arr[curr - 1]) * float(arr[curr + 1]))
             else:
@@ -98,7 +100,6 @@ def solveAddSub(arr):
     return arr
 
 def solveAll(arr):
-    
     arr = solveFactorials(arr)
     arr = solveExponents(arr)
     arr = solveMultDiv(arr)
@@ -119,7 +120,9 @@ while(option != '0'):
         case '1':
             try:
                 expression = input('What would you like to calculate: ')
-                expression = expression.replace(" ", "") #removes all spaces
+
+                # Remove all spaces
+                expression = expression.replace(" ", "")
 
                 parts = []
                 start = 0
@@ -128,8 +131,10 @@ while(option != '0'):
                 for i in range(len(expression)): 
 
                     if expression[i] == '+' or expression[i] == '-' or expression[i] == '*' or expression[i] == '/' or expression[i] == '^' or expression[i] == '(' or expression[i] == ')':
+                        
                         if(i != start):
                             parts += [expression[start:i]]
+
                         parts += [expression[i]]
                         start = i + 1
 
