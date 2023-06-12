@@ -17,7 +17,7 @@ def solve(arr):
                 end = i
 
                 # Find the start of the subarray
-                for j in range(end - 1,-1,-1):
+                for j in range(end - 1, -1, -1):
                     if arr[j] == '(':
                         start = j + 1
                         break
