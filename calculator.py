@@ -1,4 +1,4 @@
-# Function that takes in equation as an array of tokes and
+# Function that takes in equation as an array of tokens and
 # solves all operations in equation, returning the result
 def solve(arr):
     before = []
