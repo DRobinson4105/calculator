@@ -20,7 +20,7 @@ def solve(expression):
 
         # Adds all terms and operations from the input to the array
         for i in range(len(expression)):
-            if not is_number(expression[i]):
+            if not is_number(expression[i]) and expression[i] != '.':
                 if(i != start):
                     parts += [float(expression[start:i])]
 
@@ -223,13 +223,11 @@ master = Tk()
 Label(master, text="Main Value").grid(row=0, sticky = E)
 
 entry = Entry(master)
-
 entry.grid(row=0, column=1)
 
 label = Label(master)
 label.grid(row=4, column = 1)
 
-# Run the function and it will keep running in the background.
 calc()
 
 master.mainloop()
