@@ -67,9 +67,9 @@ def solve(expression):
 
                     # Solve factorials and PEMDAS on equation in array
                     solvedSubarray = parts[start:end]
+                    solvedSubarray = checkNegatives(solvedSubarray)
                     solvedSubarray = solveLogarithms(solvedSubarray)
                     solvedSubarray = solveSquareRoots(solvedSubarray)
-                    solvedSubarray = checkNegatives(solvedSubarray)
                     solvedSubarray = solveFactorials(solvedSubarray)
                     solvedSubarray = solveExponents(solvedSubarray)
                     solvedSubarray = solveMultDiv(solvedSubarray)
@@ -85,7 +85,7 @@ def solve(expression):
 
         # Only term left is answer
         if is_number(parts[0]):
-            return parts[0]
+            return round(parts[0], 5)
         else:
             return ""
 
@@ -172,7 +172,7 @@ def solveFactorials(arr):
                 sum *= num
 
             # Remove both the number and the factorial for the result
-            arr[curr] = str(sum)
+            arr[curr] = sum
             arr.pop(curr - 1)
 
         # Move to next token
@@ -188,7 +188,7 @@ def solveExponents(arr):
     while curr >= 0:
         if arr[curr] == '^':
             # Solve exponent and replace base number with result
-            arr[curr - 1] = str(pow(float(arr[curr - 1]), float(arr[curr + 1])))
+            arr[curr - 1] = pow(float(arr[curr - 1]), float(arr[curr + 1]))
 
             # Remove other tokens used in operation
             arr.pop(curr)
@@ -209,9 +209,9 @@ def solveMultDiv(arr):
         if arr[curr] == '*' or arr[curr] == '/':
             # Solve multiplication or division and replace first number with result
             if arr[curr] == '*':
-                arr[curr - 1] = str(float(arr[curr - 1]) * float(arr[curr + 1]))
+                arr[curr - 1] = float(arr[curr - 1]) * float(arr[curr + 1])
             else:
-                arr[curr - 1] = str(float(arr[curr - 1]) / float(arr[curr + 1]))
+                arr[curr - 1] = float(arr[curr - 1]) / float(arr[curr + 1])
 
             # Remove other tokens used in operation
             arr.pop(curr)
@@ -221,7 +221,7 @@ def solveMultDiv(arr):
         # If two numbers are next to each other from a number
         # being next to parenthesis which implies multiplication
         elif is_number(arr[curr]) and curr < length - 1 and is_number(arr[curr + 1]):
-            arr[curr] = str(float(arr[curr]) * float(arr[curr + 1]))
+            arr[curr] = float(arr[curr]) * float(arr[curr + 1])
             arr.pop(curr + 1)
             length -= 1
 
@@ -239,9 +239,9 @@ def solveAddSub(arr):
         if arr[curr] == '+' or arr[curr] == '-':
             # Solve addition or subtraction and replace first number with result
             if arr[curr] == '+':
-                arr[curr - 1] = str(float(arr[curr - 1]) + float(arr[curr + 1]))
+                arr[curr - 1] = float(arr[curr - 1]) + float(arr[curr + 1])
             else:
-                arr[curr - 1] = str(float(arr[curr - 1]) - float(arr[curr + 1]))
+                arr[curr - 1] = float(arr[curr - 1]) - float(arr[curr + 1])
 
             # Remove other tokens used in operation
             arr.pop(curr)
