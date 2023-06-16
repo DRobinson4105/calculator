@@ -23,7 +23,7 @@ def solve(expression):
 
         # Adds all terms and operations from the input to the array
         for i in range(len(expression)):
-            if expression[i] == '+' or expression[i] == '-' or expression[i] == '*' or expression[i] == '/' or expression[i] == '^' or expression[i] == '(' or expression[i] == ')' or expression[i] == '!':
+            if not is_number(expression[i]):
                 if(i != start):
                     parts += [float(expression[start:i])]
 
@@ -31,8 +31,8 @@ def solve(expression):
                 start = i + 1
 
         # Adds last term
-        if len(parts) == 0 or parts[-1] != ')' or parts[-1] != '!':
-            parts += [expression[start:len(expression)]]
+        if start != len(expression) and (len(parts) == 0 or parts[-1] != ')' or parts[-1] != '!'):
+            parts += [float(expression[start:len(expression)])]
 
         # Wraps whole equation in parenthesis
         parts.insert(0, '(')
@@ -45,7 +45,7 @@ def solve(expression):
         found = 1
         
         arr = parts
-
+        
         # While there is still a parenthesis in the array
         # so part of the equation has not been solved
         while found == 1:
@@ -66,7 +66,6 @@ def solve(expression):
                     # Save elements before and after subarray
                     before = arr[:start - 1]
                     after = arr[end + 1:]
-
                     # Solve subarray 
                     solvedSubarray = arr[start:end]
                     solvedSubarray = solveAll(solvedSubarray)
@@ -84,6 +83,27 @@ def solve(expression):
     # If calculation failed
     except: 
         return ""
+    
+    
+def checkNegatives(arr):
+    curr = 0
+    length = len(arr)
+    
+    # Iterate through array looking for positive and negative number symbols
+    while curr < length - 1:
+        if ((curr == 0 or (not is_number(arr[curr - 1]) and arr[curr - 1] != '!' and arr[curr - 1] != ')')) and (arr[curr] == '+' or arr[curr] == '-')):
+            # If number needs to be converted to negative
+            if (arr[curr] == '-'):
+                arr[curr + 1] *= -1
+            
+            # Remove sign
+            arr.pop(curr)
+            
+        else:
+            curr += 1
+    
+    # Return array with all positive and negative removed
+    return arr
     
 def solveFactorials(arr):
     curr = 0
@@ -189,6 +209,7 @@ def solveAddSub(arr):
 
 def solveAll(arr):
     # Solve factorials and PEMDAS on equation in array
+    arr = checkNegatives(arr)
     arr = solveFactorials(arr)
     arr = solveExponents(arr)
     arr = solveMultDiv(arr)
