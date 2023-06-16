@@ -1,4 +1,4 @@
-from tkinter import *
+import math
 
 def is_number(s):
     try:
@@ -6,7 +6,7 @@ def is_number(s):
         return True
     except ValueError:
         return False
-    
+
 # Function that takes in equation as an array of tokens and
 # solves all operations in equation, returning the result
 def solve(expression):
@@ -20,9 +20,13 @@ def solve(expression):
 
         # Adds all terms and operations from the input to the array
         for i in range(len(expression)):
-            if not is_number(expression[i]) and expression[i] != '.':
+            if not is_number(expression[i]) and expression[i] != '.' and not expression[i].isalpha():
                 if(i != start):
-                    parts += [float(expression[start:i])]
+                    if is_number(expression[start:i]):
+                        parts += [float(expression[start:i])]
+                    else:
+                        parts += [expression[start:i]]
+                    
 
                 parts += [str(expression[i])]
                 start = i + 1
@@ -39,7 +43,7 @@ def solve(expression):
         before = []
         after = []
         found = 1
-        
+
         # While there is still a parenthesis in the array
         # so part of the equation has not been solved
         while found == 1:
@@ -56,53 +60,88 @@ def solve(expression):
                         if parts[j] == '(':
                             start = j + 1
                             break
-                    
+
                     # Save elements before and after subarray
                     before = parts[:start - 1]
                     after = parts[end + 1:]
-                    
+
                     # Solve factorials and PEMDAS on equation in array
                     solvedSubarray = parts[start:end]
+                    solvedSubarray = solveLogarithms(solvedSubarray)
                     solvedSubarray = checkNegatives(solvedSubarray)
                     solvedSubarray = solveFactorials(solvedSubarray)
                     solvedSubarray = solveExponents(solvedSubarray)
                     solvedSubarray = solveMultDiv(solvedSubarray)
                     solvedSubarray = solveAddSub(solvedSubarray)
-                    
+
+                    if len(before) >= 3 and before[-2] == '_' and before[-3] == 'log':
+                        solvedSubarray[0] = ' ' + str(solvedSubarray[0])
+                        
                     # Recreate array using the three subarrays
                     parts = before + solvedSubarray + after
                     break
-        
+
         # Only term left is answer
         if is_number(parts[0]):
             return parts[0]
         else:
             return ""
-        
+
     # If calculation failed
-    except: 
+    except:
         return ""
     
+def solveLogarithms(arr):
+    length = len(arr)
+    curr = length - 1
     
+    # Iterate through array looking for logarithms
+    while curr >= 0:
+        if arr[curr] == 'log' or arr[curr] == 'ln':
+            if curr + 3 < length and arr[curr + 3][0] == ' ':
+                arr[curr + 3] = math.log(float(arr[curr + 3][1:])) / math.log(arr[curr + 2])
+
+                # Removed used tokens
+                arr.pop(curr)
+                arr.pop(curr)
+                arr.pop(curr)
+                length -= 3
+
+            else:
+                arr[curr + 1] = math.log(arr[curr + 1])
+
+                # Calculate natural log if needed
+                if arr[curr] == 'log':
+                    arr[curr + 1] /= math.log(10)
+
+                # Remove used number
+                arr.pop(curr)
+                length -= 1
+
+        curr -= 1
+
+    # Return array with all logarithms removed
+    return arr
+
 def checkNegatives(arr):
     curr = len(arr) - 1
-    
+
     # Iterate through array looking for positive and negative number symbols
     while curr >= 0:
         if ((curr == 0 or (not is_number(arr[curr - 1]) and arr[curr - 1] != '!' and arr[curr - 1] != ')')) and (arr[curr] == '+' or arr[curr] == '-')):
             # If number needs to be converted to negative
             if (arr[curr] == '-'):
                 arr[curr + 1] *= -1
-            
+
             # Remove sign
             arr.pop(curr)
-        
+
         # Move to next token
         curr -= 1
-    
+
     # Return array with all positive and negative removed
     return arr
-    
+
 def solveFactorials(arr):
     curr = len(arr) - 1
 
@@ -112,12 +151,12 @@ def solveFactorials(arr):
             # Calculate factorial
             sum = 1
             for num in range(2, int(arr[curr - 1]) + 1):
-                sum *= num                      
+                sum *= num
 
             # Remove both the number and the factorial for the result
             arr[curr] = str(sum)
             arr.pop(curr - 1)
-        
+
         # Move to next token
         curr -= 1
 
@@ -146,7 +185,7 @@ def solveExponents(arr):
 def solveMultDiv(arr):
     length = len(arr)
     curr = length - 1
-    
+
     # Iterate through array looking for multiplication and division
     while curr >= 0:
         if arr[curr] == '*' or arr[curr] == '/':
@@ -161,7 +200,7 @@ def solveMultDiv(arr):
             arr.pop(curr)
             length -= 2
 
-        # If two numbers are next to each other from a number 
+        # If two numbers are next to each other from a number
         # being next to parenthesis which implies multiplication
         elif is_number(arr[curr]) and curr < length - 1 and is_number(arr[curr + 1]):
             arr[curr] = str(float(arr[curr]) * float(arr[curr + 1]))
@@ -195,23 +234,3 @@ def solveAddSub(arr):
 
     # Return array with all addition and subtraction solved
     return arr
-
-def calc():
-    label["text"] = solve(entry.get())
-
-    # Run the function in every 100ms
-    master.after(100, calc)
-
-master = Tk()
-
-Label(master, text="Calculate").grid(row=0, sticky = E)
-
-entry = Entry(master)
-entry.grid(row=0, column=1)
-
-label = Label(master)
-label.grid(row=1, column = 1)
-
-calc()
-
-master.mainloop()
