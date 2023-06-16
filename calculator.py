@@ -1,41 +1,89 @@
+from tkinter import *
+
+def is_number(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
+    
 # Function that takes in equation as an array of tokens and
 # solves all operations in equation, returning the result
-def solve(arr):
-    before = []
-    after = []
-    found = 1
+def solve(expression):
+    if expression == "":
+        return 0
+    try:
+        
+        # Remove all spaces
+        expression = str(expression)
+        expression = expression.replace(" ", "")
 
-    # While there is still a parenthesis in the array
-    # so part of the equation has not been solved
-    while found == 1:
-        found = 0
+        parts = []
+        start = 0
 
-        # Find subarray of first set of parenthesis
-        for i in range(len(arr)):
-            if arr[i] == ')':
-                found = 1
-                end = i
+        # Adds all terms and operations from the input to the array
+        for i in range(len(expression)):
+            if expression[i] == '+' or expression[i] == '-' or expression[i] == '*' or expression[i] == '/' or expression[i] == '^' or expression[i] == '(' or expression[i] == ')' or expression[i] == '!':
+                if(i != start):
+                    parts += [float(expression[start:i])]
 
-                # Find the start of the subarray
-                for j in range(end - 1, -1, -1):
-                    if arr[j] == '(':
-                        start = j + 1
-                        break
-                
-                # Save elements before and after subarray
-                before = arr[:start - 1]
-                after = arr[end + 1:]
+                parts += [str(expression[i])]
+                start = i + 1
 
-                # Solve subarray 
-                solvedSubarray = arr[start:end]
-                solvedSubarray = solveAll(solvedSubarray)
+        # Adds last term
+        if len(parts) == 0 or parts[-1] != ')' or parts[-1] != '!':
+            parts += [expression[start:len(expression)]]
 
-                # Recreate array using the three subarrays
-                arr = before + solvedSubarray + after
-                break
-    
-    # Only term left is answer
-    return arr[0]
+        # Wraps whole equation in parenthesis
+        parts.insert(0, '(')
+        parts.append(')')
+
+        # Solves and returns result
+        
+        before = []
+        after = []
+        found = 1
+        
+        arr = parts
+
+        # While there is still a parenthesis in the array
+        # so part of the equation has not been solved
+        while found == 1:
+            found = 0
+
+            # Find subarray of first set of parenthesis
+            for i in range(len(arr)):
+                if arr[i] == ')':
+                    found = 1
+                    end = i
+
+                    # Find the start of the subarray
+                    for j in range(end - 1, -1, -1):
+                        if arr[j] == '(':
+                            start = j + 1
+                            break
+                    
+                    # Save elements before and after subarray
+                    before = arr[:start - 1]
+                    after = arr[end + 1:]
+
+                    # Solve subarray 
+                    solvedSubarray = arr[start:end]
+                    solvedSubarray = solveAll(solvedSubarray)
+
+                    # Recreate array using the three subarrays
+                    arr = before + solvedSubarray + after
+                    break
+        
+        # Only term left is answer
+        if is_number(arr[0]):
+            return arr[0]
+        else:
+            return ""
+        
+    # If calculation failed
+    except: 
+        return ""
     
 def solveFactorials(arr):
     curr = 0
@@ -86,7 +134,6 @@ def solveExponents(arr):
 def solveMultDiv(arr):
     curr = 0
     length = len(arr)
-
     # Iterate through array looking for multiplication and division
     while curr < length:
         if arr[curr] == '*' or arr[curr] == '/':
@@ -100,6 +147,13 @@ def solveMultDiv(arr):
             arr.pop(curr)
             arr.pop(curr)
             length -= 2
+
+        # If two numbers are next to each other from a number 
+        # being next to parenthesis which implies multiplication
+        elif curr < length - 1 and is_number(arr[curr]) and is_number(arr[curr + 1]):
+            arr[curr] = str(float(arr[curr]) * float(arr[curr + 1]))
+            arr.pop(curr + 1)
+            length -= 1
 
         # If current token is not multiplication or division, move to next token
         else:
@@ -141,58 +195,33 @@ def solveAll(arr):
     arr = solveAddSub(arr)
     return arr
 
-option = -1
-while(option != '0'):
+# window = tk.Tk()
+# title = tk.Label(text="Calculator")
+# label = tk.Label(text="Enter in an equation")
+# entry = tk.Entry()
 
-    print("Calculator Functions:")
-    print("0) Exit")
-    print("1) Calculate")
-    option = input("Option: ")
-    option = option.replace(" ", "")
-    
-    match option:
-        # User is exiting the calculator
-        case '0':
-            print("Thank you for using the calculator!")
+# title.pack()
+# label.pack()
+# entry.pack()
 
-        # User wants to calculate an equation
-        case '1':
-            try:
-                expression = input("What would you like to calculate: ")
+def calc():
+    label2["text"] = solve(e4.get())
 
-                # Remove all spaces
-                expression = expression.replace(" ", "")
+    # This will run the function in every 100ms (0.1 secs).
+    master.after(100, calc)
 
-                parts = []
-                start = 0
+master = Tk()
 
-                # Adds all terms and operations from the input to the array
-                for i in range(len(expression)): 
+Label(master, text="Main Value").grid(row=0, sticky = E)
 
-                    if expression[i] == '+' or expression[i] == '-' or expression[i] == '*' or expression[i] == '/':
-                        if expression[i] == '^' or expression[i] == '(' or expression[i] == ')' or expression[i] == '!':
-                            if(i != start):
-                                parts += [str(expression[start:i])]
+e4 = Entry(master)
 
-                            parts += [str(expression[i])]
-                            start = i + 1
+e4.grid(row=0, column=1)
 
-                # Adds last term
-                if parts[-1] != ')' or parts[-1] != '!':
-                    parts += [expression[start:len(expression)]]
+label2 = Label(master)
+label2.grid(row=4, column = 1)
 
-                # Wraps whole equation in parenthesis
-                parts.insert(0, '(')
-                parts.append(')')
+# Run the function and it will keep running in the background.
+calc()
 
-                # Solves and prints result
-                parts = solve(parts)
-                print('The answer is', parts)
-
-            # If calculation failed
-            except:
-                print('Could not solve this')
-
-        # Invalid input
-        case _:
-            print("That is an invalid option")
+master.mainloop()
