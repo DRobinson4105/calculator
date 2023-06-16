@@ -68,12 +68,14 @@ def solve(expression):
                     # Solve factorials and PEMDAS on equation in array
                     solvedSubarray = parts[start:end]
                     solvedSubarray = solveLogarithms(solvedSubarray)
+                    solvedSubarray = solveSquareRoots(solvedSubarray)
                     solvedSubarray = checkNegatives(solvedSubarray)
                     solvedSubarray = solveFactorials(solvedSubarray)
                     solvedSubarray = solveExponents(solvedSubarray)
                     solvedSubarray = solveMultDiv(solvedSubarray)
                     solvedSubarray = solveAddSub(solvedSubarray)
 
+                    # If number is used for a logarithm and logarithm has a base
                     if len(before) >= 3 and before[-2] == '_' and before[-3] == 'log':
                         solvedSubarray[0] = ' ' + str(solvedSubarray[0])
                         
@@ -120,7 +122,23 @@ def solveLogarithms(arr):
 
         curr -= 1
 
-    # Return array with all logarithms removed
+    # Return array with all logarithms solved
+    return arr
+
+def solveSquareRoots(arr):
+    curr = len(arr) -1
+    
+    # Iterate through array looking for square roots
+    while curr >= 0:
+        if arr[curr] == 'sqrt':
+            arr[curr + 1] = math.sqrt(arr[curr + 1])
+            
+            # Remove used token
+            arr.pop(curr)
+            
+        curr -= 1
+        
+    # Return array with all square roots solved
     return arr
 
 def checkNegatives(arr):
@@ -139,7 +157,7 @@ def checkNegatives(arr):
         # Move to next token
         curr -= 1
 
-    # Return array with all positive and negative removed
+    # Return array with all positive and negative symbols removed
     return arr
 
 def solveFactorials(arr):
