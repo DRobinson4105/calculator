@@ -80,11 +80,10 @@ def solve(expression):
     
     
 def checkNegatives(arr):
-    curr = 0
-    length = len(arr)
+    curr = len(arr) - 1
     
     # Iterate through array looking for positive and negative number symbols
-    while curr < length - 1:
+    while curr >= 0:
         if ((curr == 0 or (not is_number(arr[curr - 1]) and arr[curr - 1] != '!' and arr[curr - 1] != ')')) and (arr[curr] == '+' or arr[curr] == '-')):
             # If number needs to be converted to negative
             if (arr[curr] == '-'):
@@ -92,20 +91,18 @@ def checkNegatives(arr):
             
             # Remove sign
             arr.pop(curr)
-            length -= 1
-            
-        else:
-            curr += 1
+        
+        # Move to next token
+        curr -= 1
     
     # Return array with all positive and negative removed
     return arr
     
 def solveFactorials(arr):
-    curr = 0
-    length = len(arr)
+    curr = len(arr) - 1
 
     # Iterate through array looking for factorials
-    while curr < length:
+    while curr >= 0:
         if(arr[curr] == '!'):
             # Calculate factorial
             sum = 1
@@ -115,21 +112,18 @@ def solveFactorials(arr):
             # Remove both the number and the factorial for the result
             arr[curr] = str(sum)
             arr.pop(curr - 1)
-            length -= 1
         
-        # If current token is not a factorial, move to next token
-        else:
-            curr += 1
+        # Move to next token
+        curr -= 1
 
     # Return array with all factorials solved
     return arr
 
 def solveExponents(arr):
-    curr = 1
-    length = len(arr)
+    curr = len(arr) - 1
 
     # Iterate through array looking for exponents
-    while curr < length:
+    while curr >= 0:
         if arr[curr] == '^':
             # Solve exponent and replace base number with result
             arr[curr - 1] = str(pow(float(arr[curr - 1]), float(arr[curr + 1])))
@@ -137,21 +131,19 @@ def solveExponents(arr):
             # Remove other tokens used in operation
             arr.pop(curr)
             arr.pop(curr)
-            length -= 2
 
-        # If curent token is not an exponent, move to next token
-        else:
-            curr += 1
+        # Move to next token
+        curr -= 1
 
     # Return array with all exponents solved
     return arr
 
 def solveMultDiv(arr):
-    curr = 0
     length = len(arr)
+    curr = length - 1
     
     # Iterate through array looking for multiplication and division
-    while curr < length:
+    while curr >= 0:
         if arr[curr] == '*' or arr[curr] == '/':
             # Solve multiplication or division and replace first number with result
             if arr[curr] == '*':
@@ -166,24 +158,22 @@ def solveMultDiv(arr):
 
         # If two numbers are next to each other from a number 
         # being next to parenthesis which implies multiplication
-        elif curr < length - 1 and is_number(arr[curr]) and is_number(arr[curr + 1]):
+        elif is_number(arr[curr]) and curr < length - 1 and is_number(arr[curr + 1]):
             arr[curr] = str(float(arr[curr]) * float(arr[curr + 1]))
             arr.pop(curr + 1)
             length -= 1
 
-        # If current token is not multiplication or division, move to next token
-        else:
-            curr += 1
+        # Move to next token
+        curr -= 1
 
     # Return array with all multiplication and division solved
     return arr
 
 def solveAddSub(arr):
-    curr = 0
-    length = len(arr)
+    curr = len(arr) - 1
 
     # Iterate through array looking for addition and subtraction
-    while curr < length:
+    while curr >= 0:
         if arr[curr] == '+' or arr[curr] == '-':
             # Solve addition or subtraction and replace first number with result
             if arr[curr] == '+':
@@ -194,12 +184,10 @@ def solveAddSub(arr):
             # Remove other tokens used in operation
             arr.pop(curr)
             arr.pop(curr)
-            length -= 2
 
         # If current token is not addition or subtraction, move to next token
-        else:
-            curr += 1
-    
+        curr -= 1
+
     # Return array with all addition and subtraction solved
     return arr
 
@@ -215,18 +203,18 @@ def solveAll(arr):
 def calc():
     label["text"] = solve(entry.get())
 
-    # This will run the function in every 100ms
+    # Run the function in every 100ms
     master.after(100, calc)
 
 master = Tk()
 
-Label(master, text="Main Value").grid(row=0, sticky = E)
+Label(master, text="Calculate").grid(row=0, sticky = E)
 
 entry = Entry(master)
 entry.grid(row=0, column=1)
 
 label = Label(master)
-label.grid(row=4, column = 1)
+label.grid(row=1, column = 1)
 
 calc()
 
