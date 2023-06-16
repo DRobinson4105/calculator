@@ -10,10 +10,7 @@ def is_number(s):
 # Function that takes in equation as an array of tokens and
 # solves all operations in equation, returning the result
 def solve(expression):
-    if expression == "":
-        return 0
     try:
-        
         # Remove all spaces
         expression = str(expression)
         expression = expression.replace(" ", "")
@@ -39,12 +36,9 @@ def solve(expression):
         parts.append(')')
 
         # Solves and returns result
-        
         before = []
         after = []
         found = 1
-        
-        arr = parts
         
         # While there is still a parenthesis in the array
         # so part of the equation has not been solved
@@ -52,31 +46,31 @@ def solve(expression):
             found = 0
 
             # Find subarray of first set of parenthesis
-            for i in range(len(arr)):
-                if arr[i] == ')':
+            for i in range(len(parts)):
+                if parts[i] == ')':
                     found = 1
                     end = i
 
                     # Find the start of the subarray
                     for j in range(end - 1, -1, -1):
-                        if arr[j] == '(':
+                        if parts[j] == '(':
                             start = j + 1
                             break
                     
                     # Save elements before and after subarray
-                    before = arr[:start - 1]
-                    after = arr[end + 1:]
+                    before = parts[:start - 1]
+                    after = parts[end + 1:]
                     # Solve subarray 
-                    solvedSubarray = arr[start:end]
+                    solvedSubarray = parts[start:end]
                     solvedSubarray = solveAll(solvedSubarray)
 
                     # Recreate array using the three subarrays
-                    arr = before + solvedSubarray + after
+                    parts = before + solvedSubarray + after
                     break
         
         # Only term left is answer
-        if is_number(arr[0]):
-            return arr[0]
+        if is_number(parts[0]):
+            return parts[0]
         else:
             return ""
         
@@ -98,6 +92,7 @@ def checkNegatives(arr):
             
             # Remove sign
             arr.pop(curr)
+            length -= 1
             
         else:
             curr += 1
@@ -154,6 +149,7 @@ def solveExponents(arr):
 def solveMultDiv(arr):
     curr = 0
     length = len(arr)
+    
     # Iterate through array looking for multiplication and division
     while curr < length:
         if arr[curr] == '*' or arr[curr] == '/':
@@ -216,31 +212,22 @@ def solveAll(arr):
     arr = solveAddSub(arr)
     return arr
 
-# window = tk.Tk()
-# title = tk.Label(text="Calculator")
-# label = tk.Label(text="Enter in an equation")
-# entry = tk.Entry()
-
-# title.pack()
-# label.pack()
-# entry.pack()
-
 def calc():
-    label2["text"] = solve(e4.get())
+    label["text"] = solve(entry.get())
 
-    # This will run the function in every 100ms (0.1 secs).
+    # This will run the function in every 100ms
     master.after(100, calc)
 
 master = Tk()
 
 Label(master, text="Main Value").grid(row=0, sticky = E)
 
-e4 = Entry(master)
+entry = Entry(master)
 
-e4.grid(row=0, column=1)
+entry.grid(row=0, column=1)
 
-label2 = Label(master)
-label2.grid(row=4, column = 1)
+label = Label(master)
+label.grid(row=4, column = 1)
 
 # Run the function and it will keep running in the background.
 calc()
