@@ -60,10 +60,15 @@ def solve(expression):
                     # Save elements before and after subarray
                     before = parts[:start - 1]
                     after = parts[end + 1:]
-                    # Solve subarray 
+                    
+                    # Solve factorials and PEMDAS on equation in array
                     solvedSubarray = parts[start:end]
-                    solvedSubarray = solveAll(solvedSubarray)
-
+                    solvedSubarray = checkNegatives(solvedSubarray)
+                    solvedSubarray = solveFactorials(solvedSubarray)
+                    solvedSubarray = solveExponents(solvedSubarray)
+                    solvedSubarray = solveMultDiv(solvedSubarray)
+                    solvedSubarray = solveAddSub(solvedSubarray)
+                    
                     # Recreate array using the three subarrays
                     parts = before + solvedSubarray + after
                     break
@@ -189,15 +194,6 @@ def solveAddSub(arr):
         curr -= 1
 
     # Return array with all addition and subtraction solved
-    return arr
-
-def solveAll(arr):
-    # Solve factorials and PEMDAS on equation in array
-    arr = checkNegatives(arr)
-    arr = solveFactorials(arr)
-    arr = solveExponents(arr)
-    arr = solveMultDiv(arr)
-    arr = solveAddSub(arr)
     return arr
 
 def calc():
