@@ -1,8 +1,8 @@
 from functions import is_number
+from latexHelper import *
 
 sqrt = ['s', 'q', 'r', 't']
 log = ['l', 'o', 'g']
-frac = ['\\', 'f', 'r', 'a', 'c']
 
 def convertToLaTex(text):
     text = list(text)
@@ -20,38 +20,18 @@ def convertSquareRoots(text):
     while curr < length:
         try:
             if curr + 3 < length and text[curr:curr+4] == sqrt:
-                # If the user has only typed sqrt, display sqrt
-                if curr + 4 == length:
+                # If the user has only typed sqrt or there
+                # is not an open parenthesis after sqrt
+                if curr + 4 == length or text[curr + 4] != '(':
                     return text
-
-                # Add '\' before and '{' after the sqrt
-                text.insert(curr, '\\')
-                text.insert(curr + 5, '{')
-                length += 2
-
-                # Track the number of open sets of parenthesis at tmp
-                # Start tmp at the first character after '{'
-                count = 1
-                tmp = curr + 7
-
-                # Increment counter if an open parenthesis is found
-                # Decrement counter if a closing parenthesis is found
-                # tmp will end up at the closing parenthesis that matches the starting open parenthesis
-                while count > 0 and tmp < length:
-                    if text[tmp] == '(':
-                        count += 1
-                    elif text[tmp] == ')':
-                        count -= 1
-
-                    tmp += 1
-
-                # Add '}' after the closing parenthesis
-                if tmp == length:
-                    text.append('}')
-                else:
-                    text.insert(tmp, '}')
+                
+                # Add '\' before and '{' after the sqrt, replacing the start parenthesis of sqrt
+                text.insert(curr, '\\')                
+                text[curr + 5] = '{'
                 length += 1
 
+                # Replace end parenthesis of sqrt with end brace
+                text.pop(addEndBraceAfterParenthesis(text, curr + 7, length))
                 curr += 5
 
             curr += 1
@@ -77,34 +57,15 @@ def convertLogarithms(text):
                 if curr + 3 == length:
                     return text
                 
-                # Add '\' before and '{' after the sqrt
+                # Add '\' before and '{' after the log
                 text.insert(curr, '\\')
                 text.insert(curr + 4, '{')
                 length += 2
                 
-                # Track the number of open sets of parenthesis at tmp
-                # Start tmp at the first character after '{'
-                count = 1
-                tmp = curr + 6
-
-                # Increment counter if an open parenthesis is found
-                # Decrement counter if a closing parenthesis is found
-                # tmp will end up at the closing parenthesis that matches the starting open parenthesis
-                while count > 0 and tmp < length:
-                    if text[tmp] == '(':
-                        count += 1
-                    elif text[tmp] == ')':
-                        count -= 1
-                        
-                    tmp += 1
-                        
-                # Add '}' after the closing parenthesis
-                if tmp == length:
-                    text.append('}')
-                else:
-                    text.insert(tmp, '}')
+                # Add end brace after all open parenthesis have been
+                # closed starting at the first character after '{'
+                addEndBraceAfterParenthesis(text, curr + 6, length)
                 length += 1
-
                 curr += 4
 
             curr += 1
@@ -133,44 +94,19 @@ def convertExponents(text):
                 # Add '{' after the ^
                 text.insert(curr + 1, '{')
                 length += 1
-
-                # Track the number of open sets of parenthesis at tmp
-                # Start tmp at the first character after '{'
-                count = 1
-                tmp = curr + 2
-
-                # Keep option at 0 if power is just a number
-                option = 0
-                if text[tmp] == '(':
-                    option = 1
-                    tmp += 1
-
+                
+                # If power starts with a parenthesis, add end
+                # brace after all open parenthesis have been
+                # closed starting at the first character after '{'
+                if text[curr + 2] == '(':
+                    addEndBraceAfterParenthesis(text, curr + 2, length)
+                    
                 # If power was just a number, find end of number
-                if option == 0:
-                    while tmp < length and is_number(text[tmp]):
-                        tmp += 1
-                        
-                # Increment counter if an open parenthesis is found
-                # Decrement counter if a closing parenthesis is found
-                # tmp will end up at the closing parenthesis
-                # that matches the starting open parenthesis
                 else:
-                    while count > 0 and tmp < length:
-                        if text[tmp] == '(':
-                            count += 1
-                        elif text[tmp] == ')':
-                            count -= 1
-
-                        tmp += 1
-
-                # Add '}' after the closing parenthesis or number
-                if tmp == length:
-                    text.append('}')
-                else:
-                    text.insert(tmp, '}')
-
+                    addEndBraceAfterNumber(text, curr + 3, length)
+                    
                 length += 1
-
+                
             curr += 1
 
         # If anything fails, return array before the error
@@ -194,71 +130,40 @@ def convertFractions(text):
                 text.insert(curr, '}')
                 length += 2
                 
-                count = 1
-                tmp = curr - 1
-                
-                option = 0
-                if text[tmp] == ')':
-                    option = 1
-                    tmp -= 1
-                
-                if option == 0:
-                    while tmp >= 0 and is_number(text[tmp]):
-                        tmp -= 1
-                        
-                else:
-                    while count > 0 and tmp >= 0:
-                        if text[tmp] == '(':
-                            count -= 1
-                        elif text[tmp] == ')':
-                            count += 1
-                            
-                        tmp -= 1
-                        
-                if tmp < 0:
-                    text.insert(0, '{')
-                    for char in reversed(frac):
-                        text.insert(0, char)
-                else:
-                    text.insert(tmp, '{')
-                    for char in reversed(frac):
-                        text.insert(0, char)
+                # If numerator ends with a parenthesis, add open
+                # brace after all open parenthesis have been
+                # closed starting at the first character after '}'
+                if text[curr - 1] == '(':
+                    addOpenBraceBeforeParenthesis(text, curr - 1)
                     
+                # If power was just a number, find end of number
+                else:
+                    addOpenBraceBeforeNumber(text, curr - 2)
+                
                 length += 5
+                
+                # Move curr to starting brace of denominator
                 curr += 7
+                
+                # Remove fraction symbol
                 text.pop(curr)
                 
-                count = 1
-                tmp = curr + 1
-                
-                option = 0
-                if text[tmp] == '(':
-                    option = 1
-                    tmp += 1
+                # If denominator starts with a parenthesis, add end
+                # brace after all open parenthesis have been
+                # closed starting at the first character after '{'
+                if text[curr + 1] == '(':
+                    addEndBraceAfterParenthesis(text, curr + 1, length)
                     
-                if option == 0:
-                    while tmp < length and is_number(text[tmp]):
-                        tmp += 1
-                        
+                # If power was just a number, find end of number
                 else:
-                    while count > 0 and tmp < length:
-                        if text[tmp] == '(':
-                            count += 1
-                        elif text[tmp] == ')':
-                            count -= 1
-                            
-                        tmp += 1
-                        
-                if tmp == length:
-                    text.append('}')
-                else:
-                    text.insert(tmp, '}')
+                    addEndBraceAfterNumber(text, curr + 2, length)
                     
                 length += 1
                 
             curr += 1
         
-        except:
+        except Exception as e:
+            print(e)
             return prev
 
         prev = text.copy()
