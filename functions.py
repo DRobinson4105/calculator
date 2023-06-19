@@ -232,10 +232,11 @@ def solveMultDiv(arr):
     return arr
 
 def solveAddSub(arr):
-    curr = len(arr) - 1
+    curr = 0
+    length = len(arr)
 
     # Iterate through array looking for addition and subtraction
-    while curr >= 0:
+    while curr < length:
         if arr[curr] == '+' or arr[curr] == '-':
             # Solve addition or subtraction and replace first number with result
             if arr[curr] == '+':
@@ -246,9 +247,11 @@ def solveAddSub(arr):
             # Remove other tokens used in operation
             arr.pop(curr)
             arr.pop(curr)
+            length -= 2
 
         # If current token is not addition or subtraction, move to next token
-        curr -= 1
+        else:
+            curr += 1
 
     # Return array with all addition and subtraction solved
     return arr
