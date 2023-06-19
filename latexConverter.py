@@ -11,12 +11,12 @@ def convertToLaTex(text):
     text = convertExponents(text)
     text = convertFractions(text)
     return "".join(text)
-    
+
 def convertSquareRoots(text):
     prev = text.copy()
     curr = 0
     length = len(text)
-        
+
     while curr < length:
         try:
             if curr + 3 < length and text[curr:curr+4] == sqrt:
@@ -24,7 +24,7 @@ def convertSquareRoots(text):
                 # is not an open parenthesis after sqrt
                 if curr + 4 == length or text[curr + 4] != '(':
                     return text
-                
+
                 # Add '\' before and '{' after the sqrt, replacing the start parenthesis of sqrt
                 text.insert(curr, '\\')                
                 text[curr + 5] = '{'
@@ -35,15 +35,15 @@ def convertSquareRoots(text):
                 curr += 5
 
             curr += 1
-            
+
         # If anything fails, return array before the error
         except:
             return prev
-        
+
         prev = text.copy()
-        
+
     return text
-    
+
 
 def convertLogarithms(text):
     prev = text.copy()
@@ -56,12 +56,12 @@ def convertLogarithms(text):
                 # If the user has only typed log, display log
                 if curr + 3 == length:
                     return text
-                
+
                 # Add '\' before and '{' after the log
                 text.insert(curr, '\\')
                 text.insert(curr + 4, '{')
                 length += 2
-                
+
                 # Add end brace after all open parenthesis have been
                 # closed starting at the first character after '{'
                 addEndBraceAfterParenthesis(text, curr + 6, length)
@@ -69,13 +69,13 @@ def convertLogarithms(text):
                 curr += 4
 
             curr += 1
-            
+
         # If anything fails, return array before the error
         except:
             return prev
-        
+
         prev = text.copy()
-            
+
     return text
 
 def convertExponents(text):
@@ -87,26 +87,26 @@ def convertExponents(text):
         # If the user has not typed the power yet
         if text[curr] == '^' and curr == length - 1:
             return text[:-1]
-        
+
         try:
             # If exponent is found and the power has multiple characters
             if text[curr] == '^' and not (is_number(text[curr + 1]) and (curr + 2 == length or not is_number(text[curr + 2]))):
                 # Add '{' after the ^
                 text.insert(curr + 1, '{')
                 length += 1
-                
+
                 # If power starts with a parenthesis, add end
                 # brace after all open parenthesis have been
                 # closed starting at the first character after '{'
                 if text[curr + 2] == '(':
                     addEndBraceAfterParenthesis(text, curr + 2, length)
-                    
+
                 # If power was just a number, find end of number
                 else:
                     addEndBraceAfterNumber(text, curr + 3, length)
-                    
+
                 length += 1
-                
+
             curr += 1
 
         # If anything fails, return array before the error
@@ -121,7 +121,7 @@ def convertFractions(text):
     prev = text.copy()
     curr = 0
     length = len(text)
-    
+
     while curr < length:
         try:
             # If fraction is found
@@ -129,43 +129,43 @@ def convertFractions(text):
                 text.insert(curr + 1, '{')
                 text.insert(curr, '}')
                 length += 2
-                
+
                 # If numerator ends with a parenthesis, add open
                 # brace after all open parenthesis have been
                 # closed starting at the first character after '}'
                 if text[curr - 1] == '(':
                     addOpenBraceBeforeParenthesis(text, curr - 1)
-                    
+
                 # If power was just a number, find end of number
                 else:
                     addOpenBraceBeforeNumber(text, curr - 2)
-                
+
                 length += 5
-                
+
                 # Move curr to starting brace of denominator
                 curr += 7
-                
+
                 # Remove fraction symbol
                 text.pop(curr)
-                
+
                 # If denominator starts with a parenthesis, add end
                 # brace after all open parenthesis have been
                 # closed starting at the first character after '{'
                 if text[curr + 1] == '(':
                     addEndBraceAfterParenthesis(text, curr + 1, length)
-                    
+
                 # If power was just a number, find end of number
                 else:
                     addEndBraceAfterNumber(text, curr + 2, length)
-                    
+
                 length += 1
-                
+
             curr += 1
-        
+
         except Exception as e:
             print(e)
             return prev
 
         prev = text.copy()
-        
+
     return text

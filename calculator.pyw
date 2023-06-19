@@ -2,11 +2,10 @@
 from tkinter import *
 from tkinter import ttk
 import matplotlib
-import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from functions import *
 from latexConverter import *
-    
+
 matplotlib.use('TkAgg')
 
 displayAnswer = False
@@ -26,29 +25,29 @@ def graph():
 	try:
 		# Get the entry input
 		expression = entry.get()
-  
+
 		# Displaying expression
 		if not displayAnswer:
 			global lastExpression
 			lastExpression = expression
-   
+
 		# Displaying answer
 		else:
 			expression = str(solve(lastExpression))
-   
+
 		# Convert expression to latex format
 		expression = convertToLaTex(expression)
-  
+
 		# Only setup expression if expression is not empty
 		expression = "$"+expression+"$" if expression != "" else ""
-  
+
 		# Clear any previous text from the figure
 		wx.clear()
 		wx.text(0.5, 0.5, expression, fontsize = 20, ha='center', va='center')
 		canvas.draw()
-  
+
 	except: pass
- 
+
 	win.after(100,graph)
 
 # Create an instance of tkinter frame

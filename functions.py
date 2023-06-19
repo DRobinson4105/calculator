@@ -26,7 +26,7 @@ def solve(expression):
                         parts += [float(expression[start:i])]
                     else:
                         parts += [expression[start:i]]
-                    
+
 
                 parts += [str(expression[i])]
                 start = i + 1
@@ -78,7 +78,7 @@ def solve(expression):
                     # If number is used for a logarithm and logarithm has a base
                     if len(before) >= 3 and before[-2] == '_' and before[-3] == 'log':
                         solvedSubarray[0] = ' ' + str(solvedSubarray[0])
-                        
+
                     # Recreate array using the three subarrays
                     parts = before + solvedSubarray + after
                     break
@@ -92,11 +92,11 @@ def solve(expression):
     # If calculation failed
     except:
         return ""
-    
+
 def solveLogarithms(arr):
     length = len(arr)
     curr = length - 1
-    
+
     # Iterate through array looking for logarithms
     while curr >= 0:
         if arr[curr] == 'log' or arr[curr] == 'ln':
@@ -127,17 +127,17 @@ def solveLogarithms(arr):
 
 def solveSquareRoots(arr):
     curr = len(arr) -1
-    
+
     # Iterate through array looking for square roots
     while curr >= 0:
         if arr[curr] == 'sqrt':
             arr[curr + 1] = math.sqrt(arr[curr + 1])
-            
+
             # Remove used token
             arr.pop(curr)
-            
+
         curr -= 1
-        
+
     # Return array with all square roots solved
     return arr
 
