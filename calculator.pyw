@@ -9,13 +9,33 @@ from latexConverter import *
     
 matplotlib.use('TkAgg')
 
+displayAnswer = False
+
+def calculate():
+    global displayAnswer
+    displayAnswer = True
+
+def reset():
+    global displayAnswer
+    displayAnswer = False
+    entry.delete(0, END)
+
 # Displays given expression in LaTex format and result
 def graph():
     # Prevents program from crashing when invalid input is given
 	try:
-		# Get the Entry Input
+		# Get the entry input
 		expression = entry.get()
-
+  
+		# Displaying expression
+		if not displayAnswer:
+			global lastExpression
+			lastExpression = expression
+   
+		# Displaying answer
+		else:
+			expression = str(solve(lastExpression))
+   
 		# Convert expression to latex format
 		expression = convertToLaTex(expression)
   
@@ -25,12 +45,11 @@ def graph():
 		# Clear any previous text from the figure
 		wx.clear()
 		wx.text(0.5, 0.5, expression, fontsize = 20, ha='center', va='center')
-		label2["text"] = solve(entry.get())
 		canvas.draw()
-
+  
 	except: pass
-	# Repeatedly solve and display the input every 100 ms
-	win.after(100, graph)
+ 
+	win.after(100,graph)
 
 # Create an instance of tkinter frame
 win = Tk()
@@ -40,6 +59,7 @@ win.title("Calculator")
 # Create a Frame object
 frame = Frame(win)
 frame.pack()
+
 # Create an Entry widget
 var = StringVar()
 entry = Entry(frame, width=70, textvariable=var)
@@ -49,8 +69,11 @@ entry.pack()
 label = Label(frame)
 label.pack()
 
-label2 = Label(frame)
-label2.pack()
+# Calculate and Reset Buttons
+calculateB = ttk.Button(win, text="Calculate", command=calculate)
+resetB = ttk.Button(win, text="Reset", command=reset)
+calculateB.pack()
+resetB.pack()
 
 # Define the figure size and plot the figure
 fig = matplotlib.figure.Figure(figsize=(7, 1), dpi=100)
@@ -63,6 +86,5 @@ canvas._tkcanvas.pack(side=TOP, fill=BOTH, expand=1)
 wx.get_xaxis().set_visible(False)
 wx.get_yaxis().set_visible(False)
 
-graph()
-
+win.after(100,graph)
 win.mainloop()
