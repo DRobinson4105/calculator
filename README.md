@@ -1,4 +1,4 @@
-Run application from calculator.pyw
+Run calculator from calculator.pyw
 ___
 Calculator Functions:
 - Addition
