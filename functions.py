@@ -1,4 +1,5 @@
 import math
+from helpers import *
 
 def is_number(s):
     try:
@@ -6,6 +7,15 @@ def is_number(s):
         return True
     except ValueError:
         return False
+    
+def char_type(c):
+    if is_number(c) or c == '.':
+        return 'n'
+    if c.isalpha():
+        return 'a'
+    if c == '(' or c == ')':
+        return 'p'
+    return 'o'
 
 # Function that takes in equation as an array of tokens and
 # solves all operations in equation, returning the result
@@ -20,20 +30,19 @@ def solve(expression):
 
         # Adds all terms and operations from the input to the array
         for i in range(len(expression)):
-            if not is_number(expression[i]) and expression[i] != '.' and not expression[i].isalpha():
-                if(i != start):
-                    if is_number(expression[start:i]):
-                        parts += [float(expression[start:i])]
-                    else:
-                        parts += [expression[start:i]]
+            if char_type(expression[i]) != char_type(expression[start]):
+                if is_number(expression[start:i]):
+                    parts += [float(expression[start:i])]
+                else:
+                    parts += [expression[start:i]]
 
-
-                parts += [str(expression[i])]
-                start = i + 1
+                start = i
 
         # Adds last term
-        if start != len(expression) and (len(parts) == 0 or parts[-1] != ')' or parts[-1] != '!'):
+        if is_number(expression[start:len(expression)]):
             parts += [float(expression[start:len(expression)])]
+        else:
+            parts += [expression[start:len(expression)]]
 
         # Wraps whole equation in parenthesis
         parts.insert(0, '(')
@@ -75,10 +84,6 @@ def solve(expression):
                     solvedSubarray = solveMultDiv(solvedSubarray)
                     solvedSubarray = solveAddSub(solvedSubarray)
 
-                    # If number is used for a logarithm and logarithm has a base
-                    if len(before) >= 3 and before[-2] == '_' and before[-3] == 'log':
-                        solvedSubarray[0] = ' ' + str(solvedSubarray[0])
-
                     # Recreate array using the three subarrays
                     parts = before + solvedSubarray + after
                     break
@@ -94,31 +99,28 @@ def solve(expression):
         return ""
 
 def solveLogarithms(arr):
-    length = len(arr)
-    curr = length - 1
+    curr = len(arr) - 1
 
     # Iterate through array looking for logarithms
     while curr >= 0:
         if arr[curr] == 'log' or arr[curr] == 'ln':
-            if curr + 3 < length and arr[curr + 3][0] == ' ':
-                arr[curr + 3] = math.log(float(arr[curr + 3][1:])) / math.log(arr[curr + 2])
 
-                # Removed used tokens
-                arr.pop(curr)
-                arr.pop(curr)
-                arr.pop(curr)
-                length -= 3
+            # If user inputed a base
+            if arr[curr + 1] == '_':
+                arr[curr + 3] = math.log(arr[curr + 3]) / math.log(arr[curr + 2])
+
+                # Remove used tokens
+                for i in range(3): arr.pop(curr)
 
             else:
                 arr[curr + 1] = math.log(arr[curr + 1])
 
-                # Calculate natural log if needed
+                # If not natural log
                 if arr[curr] == 'log':
                     arr[curr + 1] /= math.log(10)
 
-                # Remove used number
+                # Removed used token
                 arr.pop(curr)
-                length -= 1
 
         curr -= 1
 

@@ -1,6 +1,11 @@
-from functions import is_number
-
-def addEndBraceAfterParenthesis(text, curr, length):
+def is_number(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
+    
+def findEndParenthesis(text, curr, length):
     count = 1
 
     # Increment counter if an open parenthesis is found
@@ -15,27 +20,16 @@ def addEndBraceAfterParenthesis(text, curr, length):
 
         curr += 1
 
-    # Add '}' after the closing parenthesis
-    if curr == length:
-        text.append('}')
-    else:
-        text.insert(curr, '}')
-
     return curr - 1
 
-def addEndBraceAfterNumber(text, curr, length):
+def findEndNumber(text, curr, length):
     # Find end of number
     while curr < length and is_number(text[curr]):
         curr += 1
 
-    # Add '}' after the number
-    if curr == length:
-        text.append('}')
-    else:
-        text.insert(curr, '}')
+    return curr - 1
 
-def addOpenBraceBeforeParenthesis(text, curr):
-    frac = ['\\', 'f', 'r', 'a', 'c']
+def findStartParenthesis(text, curr):
     count = 1
 
     # Decrement counter if an open parenthesis is found
@@ -50,31 +44,13 @@ def addOpenBraceBeforeParenthesis(text, curr):
 
         curr -= 1
 
-    # Add '{' before the open parenthesis
-    if curr < 0:
-        text.insert(0, '{')
-        for char in reversed(frac):
-            text.insert(0, char)
-    else:
-        text.insert(curr, '{')
-        for char in reversed(frac):
-            text.insert(curr, char)
-
     return curr + 1
             
-def addOpenBraceBeforeNumber(text, curr):
+def findStartNumber(text, curr):
     frac = ['\\', 'f', 'r', 'a', 'c']
 
     # Find beginning of number
     while curr >= 0 and is_number(text[curr]):
         curr -= 1
 
-    # Add '{' before the number
-    if curr < 0:
-        text.insert(0, '{')
-        for char in reversed(frac):
-            text.insert(0, char)
-    else:
-        text.insert(curr, '{')
-        for char in reversed(frac):
-            text.insert(curr, char)
+    return curr + 1

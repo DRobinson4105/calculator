@@ -1,8 +1,9 @@
 from functions import is_number
-from latexHelper import *
+from helpers import *
 
 sqrt = ['s', 'q', 'r', 't']
 log = ['l', 'o', 'g']
+frac = ['\\', 'f', 'r', 'a', 'c']
 
 def convertToLaTex(text):
     text = list(text)
@@ -31,7 +32,15 @@ def convertSquareRoots(text):
                 length += 1
 
                 # Replace end parenthesis of sqrt with end brace
-                text.pop(addEndBraceAfterParenthesis(text, curr + 7, length))
+                tmp = findEndParenthesis(text, curr + 7, length)
+                
+                # Replace closing parenthesis with '}'
+                if tmp == length - 1:
+                    text.append('}')
+                else:
+                    text.insert(tmp + 1, '}')
+                
+                text.pop(tmp)
                 curr += 5
 
             curr += 1
@@ -64,7 +73,14 @@ def convertLogarithms(text):
 
                 # Add end brace after all open parenthesis have been
                 # closed starting at the first character after '{'
-                addEndBraceAfterParenthesis(text, curr + 6, length)
+                tmp = findEndParenthesis(text, curr + 6, length)
+                
+                # Add '}' after the closing parenthesis
+                if tmp == length - 1:
+                    text.append('}')
+                else:
+                    text.insert(tmp + 1, '}')
+                    
                 length += 1
                 curr += 4
 
@@ -99,11 +115,23 @@ def convertExponents(text):
                 # brace after all open parenthesis have been
                 # closed starting at the first character after '{'
                 if text[curr + 2] == '(':
-                    addEndBraceAfterParenthesis(text, curr + 2, length)
+                    tmp = findEndParenthesis(text, curr + 2, length)
+                    
+                    # Add '}' after the closing parenthesis
+                    if tmp == length - 1:
+                        text.append('}')
+                    else:
+                        text.insert(tmp + 1, '}')
 
                 # If power was just a number, find end of number
                 else:
-                    addEndBraceAfterNumber(text, curr + 3, length)
+                    tmp = findEndNumber(text, curr + 3, length)
+                    
+                    # Add '}' after the number
+                    if tmp == length - 1:
+                        text.append('}')
+                    else:
+                        text.insert(tmp + 1, '}')
 
                 length += 1
 
@@ -133,12 +161,32 @@ def convertFractions(text):
                 # If numerator ends with a parenthesis, add open
                 # brace after all open parenthesis have been
                 # closed starting at the first character after '}'
-                if text[curr - 1] == '(':
-                    addOpenBraceBeforeParenthesis(text, curr - 1)
+                if text[curr - 1] == ')':
+                    tmp = findStartParenthesis(text, curr - 2)
+                    
+                    # Add '{' before the open parenthesis
+                    if tmp < 0:
+                        text.insert(0, '{')
+                        for char in reversed(frac):
+                            text.insert(0, char)
+                    else:
+                        text.insert(tmp, '{')
+                        for char in reversed(frac):
+                            text.insert(tmp, char)
 
                 # If power was just a number, find end of number
                 else:
-                    addOpenBraceBeforeNumber(text, curr - 2)
+                    tmp = findStartNumber(text, curr - 1)
+                    
+                    # Add '{' before the number
+                    if tmp < 0:
+                        text.insert(0, '{')
+                        for char in reversed(frac):
+                            text.insert(0, char)
+                    else:
+                        text.insert(tmp, '{')
+                        for char in reversed(frac):
+                            text.insert(tmp, char)
 
                 length += 5
 
@@ -152,18 +200,29 @@ def convertFractions(text):
                 # brace after all open parenthesis have been
                 # closed starting at the first character after '{'
                 if text[curr + 1] == '(':
-                    addEndBraceAfterParenthesis(text, curr + 1, length)
+                    tmp = findEndParenthesis(text, curr + 2, length)
+                    
+                    # Add '}' after the closing parenthesis
+                    if tmp == length - 1:
+                        text.append('}')
+                    else:
+                        text.insert(tmp + 1, '}')
 
                 # If power was just a number, find end of number
                 else:
-                    addEndBraceAfterNumber(text, curr + 2, length)
+                    tmp = findEndNumber(text, curr + 1, length)
 
+                    # Add '}' after the number
+                    if tmp == length - 1:
+                        text.append('}')
+                    else:
+                        text.insert(tmp + 1, '}')
+                        
                 length += 1
 
             curr += 1
 
-        except Exception as e:
-            print(e)
+        except:
             return prev
 
         prev = text.copy()
