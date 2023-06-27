@@ -74,7 +74,7 @@ def solve(expression):
                     before = parts[:start - 1]
                     after = parts[end + 1:]
 
-                    # Solve factorials and PEMDAS on equation in array
+                    # Solve all operations on expression in subarray
                     solvedSubarray = parts[start:end]
                     solvedSubarray = checkNegatives(solvedSubarray)
                     solvedSubarray = solveLogarithms(solvedSubarray)

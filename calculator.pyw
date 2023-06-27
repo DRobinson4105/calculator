@@ -8,14 +8,20 @@ from latexConverter import *
 
 matplotlib.use('TkAgg')
 
+# Initial values
+global displayAnswer
 displayAnswer = False
+global lastExpression
+lastExpression = ""
 
+# Calculate button
 def calculate():
     global lastExpression
     lastExpression = expression
     global displayAnswer
     displayAnswer = True
 
+# Reset button
 def reset():
     global displayAnswer
     displayAnswer = False
@@ -30,8 +36,13 @@ def graph():
 		expression = entry.get()
 		display = expression
   
+		# If user has changed input
+		global displayAnswer
+		if expression != lastExpression:
+			displayAnswer = False
+  
 		# Displaying answer
-		if (displayAnswer and display != '') and expression == lastExpression:
+		if displayAnswer and display != '':
 			display = solve(lastExpression)
 			if int(display) == display:
 				display = int(display)
