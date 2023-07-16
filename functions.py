@@ -15,7 +15,10 @@ def char_type(c):
         return 'a'
     if c == '(' or c == ')':
         return 'p'
-    return 'o'
+    if c == '+' or c == '-' or c == '*' or c == '/' or c == '!' or c == '^' or c == '_':
+        return 'o'
+
+    return 'e'
 
 # Function that takes in equation as an array of tokens and
 # solves all operations in equation, returning the result
@@ -30,6 +33,10 @@ def solve(expression):
 
         # Adds all terms and operations from the input to the array
         for i in range(len(expression)):
+            if char_type(expression[i]) == 'e':
+                print(expression[i])
+                raise Exception()
+
             if char_type(expression[i]) != char_type(expression[start]):
                 if is_number(expression[start:i]):
                     parts += [float(expression[start:i])]

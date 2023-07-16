@@ -53,7 +53,6 @@ def convertSquareRoots(text):
 
     return text
 
-
 def convertLogarithms(text):
     prev = text.copy()
     curr = 0
@@ -66,23 +65,55 @@ def convertLogarithms(text):
                 if curr + 3 == length:
                     return text
 
-                # Add '\' before and '{' after the log
+                # Add '\' before the log
                 text.insert(curr, '\\')
-                text.insert(curr + 4, '{')
-                length += 2
+                length += 1
+                curr += 4
+
+                # If log base was given
+                if text[curr] == '_':
+                    # Add '{' before base
+                    text.insert(curr + 1, '{')
+                    length += 1
+
+                    # Find end of base
+                    if text[curr + 2] == '(':
+                        pos = findEndParenthesis(text, curr + 3, length)
+                    else:
+                        pos = findEndNumber(text, curr + 2, length)
+
+                    print(text[pos])
+
+                    # Add '}' after the closing parenthesis
+                    if pos == length - 1:
+                        text.append('}')
+                    else:
+                        text.insert(pos + 1, '}')
+                    length += 1
+
+                    # Move curr to after base
+                    curr = pos + 2
+
+                # Save base
+                prev = text.copy()
+                print(text)
+
+                # Add '{' after base and log
+                text.insert(curr, '{')
+                length += 1
 
                 # Add end brace after all open parenthesis have been
                 # closed starting at the first character after '{'
-                tmp = findEndParenthesis(text, curr + 6, length)
-                
+                tmp = findEndParenthesis(text, curr + 3, length)
+
                 # Add '}' after the closing parenthesis
                 if tmp == length - 1:
                     text.append('}')
                 else:
                     text.insert(tmp + 1, '}')
-                    
+
                 length += 1
-                curr += 4
+                curr = tmp + 1
 
             curr += 1
 
