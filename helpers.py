@@ -4,7 +4,7 @@ def is_number(s):
         return True
     except:
         return False
-    
+
 def findEndParenthesis(text, curr, length):
     count = 1
 
@@ -45,12 +45,25 @@ def findStartParenthesis(text, curr):
         curr -= 1
 
     return curr + 1
-            
-def findStartNumber(text, curr):
-    frac = ['\\', 'f', 'r', 'a', 'c']
 
+def findStartNumber(text, curr):
     # Find beginning of number
     while curr >= 0 and is_number(text[curr]):
         curr -= 1
 
     return curr + 1
+
+def char_type(c):
+    if is_number(c) or c == '.':
+        return 'n'
+    if c.isalpha():
+        return 'a'
+    if c == '(' or c == ')':
+        return 'p'
+    if c == '+' or c == '-' or c == '*' or c == '/' or c == '!' or c == '^' or c == '_':
+        return 'o'
+
+    return 'e'
+
+def validWords(text):
+    return text == 'pi' or text == 'log' or text == 'sqrt'

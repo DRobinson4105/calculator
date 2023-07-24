@@ -3,8 +3,8 @@ from tkinter import ttk
 import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from functions import *
-from latexConverter import *
+from functions import solve
+from latexConverter import convertToLaTex
 
 matplotlib.use('TkAgg')
 
@@ -35,26 +35,22 @@ def graph():
 		global expression
 		expression = entry.get()
 		display = expression
-  
+
 		# If user has changed input
 		global displayAnswer
 		if expression != lastExpression:
 			displayAnswer = False
-  
+
 		# Displaying answer
 		if displayAnswer and display != '':
-			display = solve(lastExpression)
-			if int(display) == display:
-				display = int(display)
+			display = str(solve(lastExpression))
 
-			display = str(display)
-  
 		# Convert expression to latex format
 		display = convertToLaTex(display)
 
 		# Only setup expression if expression is not empty
 		display = "$"+display+"$" if display != "" else ""
-  
+
 		wx.clear()
 		wx.text(0.5, 0.5, display, fontsize = 20, ha='center', va='center')
 		canvas.draw()
@@ -69,7 +65,7 @@ def graph():
 
 # Create an instance of tkinter frame
 win = Tk()
-win.geometry("700x350")
+win.geometry("700x200")
 win.title("Calculator")
 
 # Create a Frame object

@@ -1,43 +1,23 @@
 import math
 from helpers import *
 
-def is_number(s):
-    try:
-        float(s)
-        return True
-    except ValueError:
-        return False
-    
-def char_type(c):
-    if is_number(c) or c == '.':
-        return 'n'
-    if c.isalpha():
-        return 'a'
-    if c == '(' or c == ')':
-        return 'p'
-    if c == '+' or c == '-' or c == '*' or c == '/' or c == '!' or c == '^' or c == '_':
-        return 'o'
-
-    return 'e'
-
 # Function that takes in equation as an array of tokens and
 # solves all operations in equation, returning the result
 def solve(expression):
     try:
         # Remove all spaces
-        expression = str(expression)
-        expression = expression.replace(" ", "")
+        expression = str(expression).replace(" ", "")
 
         parts = []
         start = 0
 
         # Adds all terms and operations from the input to the array
         for i in range(len(expression)):
+            # If current character is invalid
             if char_type(expression[i]) == 'e':
-                print(expression[i])
                 raise Exception()
 
-            if char_type(expression[i]) != char_type(expression[start]):
+            if char_type(expression[i]) != char_type(expression[start]) or validWords(expression[start:i]):
                 if is_number(expression[start:i]):
                     parts += [float(expression[start:i])]
                 else:
@@ -83,6 +63,7 @@ def solve(expression):
 
                     # Solve all operations on expression in subarray
                     solvedSubarray = parts[start:end]
+                    solvedSubarray = solvePI(solvedSubarray)
                     solvedSubarray = checkNegatives(solvedSubarray)
                     solvedSubarray = solveLogarithms(solvedSubarray)
                     solvedSubarray = solveSquareRoots(solvedSubarray)
@@ -96,14 +77,26 @@ def solve(expression):
                     break
 
         # Only term left is answer
-        if is_number(parts[0]):
-            return round(parts[0], 5)
+        if is_number(parts[0]) and len(parts) == 1:
+            return int(parts[0]) if parts[0] == int(parts[0]) else round(parts[0], 5)
         else:
             return ""
 
     # If calculation failed
     except:
         return ""
+    
+def solvePI(arr):
+    curr = len(arr) - 1
+
+    # Iterate through array looking for pi
+    while curr >= 0:
+        if arr[curr] == 'pi':
+            arr[curr] = math.pi
+
+        curr -= 1
+
+    return arr
 
 def solveLogarithms(arr):
     curr = len(arr) - 1
